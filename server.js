@@ -128,11 +128,10 @@ app.put('/api/event/:eventID/user/:userID', (req, res) => {
   console.log("Updating attendee list for event: " + req.params.eventID);
   const userId = req.params.userID;
   const eventId = req.params.eventID;
-  const statusArray = ['Interested', 'Registered', 'Paid'];
-  const randomNumber = Math.floor(Math.random() * statusArray.length);
+  const status = "Registered";
   const queryString = "INSERT INTO Participate (UserID, EventID, Status) VALUES (?, ?, ?)";
 
-  getConnection().query(queryString, [userId, eventId, statusArray[randomNumber]], (err, results, fields) => {
+  getConnection().query(queryString, [userId, eventId, status], (err, results, fields) => {
     if (err) {
       console.log("Failed to update attendee list");
       res.sendStatus(500);
@@ -161,6 +160,10 @@ app.post('/api/user', (req, res) => {
   const queryStringDateOfBirth = "INSERT INTO DoB (DateOfBirth, Age) VALUES (?, ?)";
   const queryStringCard = "INSERT INTO CreditCard (CardNumber, ExpiryDate, HolderName, CVC) VALUES (?, ?, ?, ?)";
 
+  const today = new Date();
+  const birthDate = new Date(dateOfBirth);
+  const age = today.getFullYear() - birthDate.getFullYear();
+
   getConnection().query(queryStringUser, [firstName, lastName, dateOfBirth, gender], (err, results, fields) => {
     if (err) {
       console.log("Failed to insert new user: " + err);
@@ -170,8 +173,7 @@ app.post('/api/user', (req, res) => {
     console.log("Inserted a new user with id: " + results.insertId);
   });
 
-  // TODO: properly insert age instead of using Math.random()
-  getConnection().query(queryStringDateOfBirth, [dateOfBirth, (Math.floor(Math.random() * 10) * 3)], (err, results, fields) => {
+  getConnection().query(queryStringDateOfBirth, [dateOfBirth, age], (err, results, fields) => {
     if (err) {
       console.log("Failed to insert new birthday entry: " + err);
       res.sendStatus(500);
