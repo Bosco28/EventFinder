@@ -21,7 +21,7 @@ class EventDisplayer extends Component {
         location: null,
         title: null,
         organizerName: null,
-        types: [],
+        types: null,
         startDate: null,
         endDate: null,
         loading: false
@@ -62,7 +62,7 @@ class EventDisplayer extends Component {
                     location: null,
                     title: null,
                     organizerName: null,
-                    types: [],
+                    types: null,
                     startDate: null,
                     endDate: null,
                     loading: false
@@ -217,8 +217,8 @@ class EventDisplayer extends Component {
                                         Description: {event.Description} <br />
                                         Location:    {event.LocationAddress} <br />
                                         Organizer:   {event.OrganizerName} <br />
-                                        Attendees:   {event.Attendees.toString()} <br />
-                                        Types:       {event.Types.toString()}
+                                        Attendees:   {event.Attendees} <br />
+                                        Types:       {event.Types}
                                     </Typography>
                                 </CardContent>
                             </Card>

@@ -17,27 +17,46 @@ function getConnection() {
   });
 }
 
-function buildConditions(params) {
+function buildWheres(params) {
   var conditions = [];
   var values = [];
 
-  if (typeof params.location !== 'undefined') {
+  if (params.location !== null) {
     conditions.push("e.LocationAddress LIKE ?");
     values.push("%" + params.location + "%");
   }
 
-  if (typeof params.title !== 'undefined') {
-    conditions.push("e.Title LIKE= ?");
+  if (params.title !== null) {
+    conditions.push("e.Title LIKE ?");
     values.push("%" + params.title + "%");
   }
 
-  if (typeof params.startDate !== 'undefined' &&
-      typeof params.endDate !== 'undefined') {
+  if (params.organizerName !== null) {
+    conditions.push("CONCAT(u.FirstName, \" \", u.LastName) LIKE ?");
+    values.push("%" + params.organizerName + "%");
+  }
+
+  if (params.startDate !== null && params.endDate !== null) {
     conditions.push("e.StartDate BETWEEN ? AND ? AND e.EndDate BETWEEN ? AND ?");
     values.push(params.startDate);
     values.push(params.endDate);
     values.push(params.startDate);
     values.push(params.endDate);
+  }
+
+  if (params.types !== null && params.types.length) {
+    query = 
+      "e.EventID IN \
+        (SELECT e1.EventID FROM Event e1 \
+          WHERE NOT EXISTS \
+            (SELECT * FROM EventType et \
+              WHERE et.TypeName IN (?) AND \
+                NOT EXISTS \
+                (SELECT * FROM EventHasType eht \
+		              WHERE eht.EventID = e1.EventID AND \
+                    eht.EventType = et.TypeName)))"
+    conditions.push(query);
+    values.push(params.types.toString());
   }
 
   return {
@@ -52,40 +71,31 @@ function buildConditions(params) {
 // TODO?
 app.post('/api/events', (req, res) => {
   console.log(req.body);
+  whereXvalues = buildWheres(req.body);
+  whereClauses = whereXvalues.where;
+  whereValues = whereXvalues.values;
 
-  whereXvalues = buildConditions(req.body);
+  queryString = 
+    "SELECT e.*, \
+            CONCAT(u.FirstName, \" \", u.LastName) as OrganizerName, \
+            (SELECT GROUP_CONCAT(eht.EventType) \
+              FROM EventHasType eht \
+              WHERE eht.EventID = e.EventID) as Types, \
+            (SELECT DISTINCT GROUP_CONCAT(CONCAT(u1.FirstName, \" \", u1.LastName)) \
+              FROM Participate p JOIN User u1 \
+              WHERE P.EventID = P.EventID) as Attendees \
+            FROM Event e \
+            JOIN User u ON e.OrganizerUserID=u.UserID " + whereClauses;
+
+            
+  console.log(queryString);
   console.log(whereXvalues);
-  where = whereXvalues.where;
-  values = whereXvalues.values;
-
-  res.send(
-    [
-      {
-        EventID: 0,
-        Title: 'CPSC 304 Final Exam',
-        StartDate: new Date(2020, 1, 2, 10, 0, 0, 0),
-        EndDate: new Date(2020, 1, 2, 12, 0, 0, 0),
-        Description: 'In person final exam. All students must attend',
-        LocationAddress: '6245 Agronomy Rd, Vancouver, BC V6T 1Z4',
-        OrganizerUserID: 0,
-        OrganizerName: 'Bob Smith',
-        Attendees: ["Jack Ding", "Bob Smith", "Alex Doe"],
-        Types: ["study"]
-      },
-      {
-        EventID: 1,
-        Title: 'CPSC 304 Review Session',
-        StartDate: new Date(2020, 1, 1, 10, 0, 0, 0),
-        EndDate: new Date(2020, 1, 1, 12, 0, 0, 0),
-        Description: 'Optional review session',
-        LocationAddress: '6245 Agronomy Rd, Vancouver, BC V6T 1Z4',
-        OrganizerUserID: 1,
-        OrganizerName: 'Jacky Ding',
-        Attendees: ["Jack Ding", "Bob Smith", "Alex Doe", "Chris Burton"],
-        Types: ["study", "group event"]
-      }
-    ]
-  )
+  getConnection().query(queryString, whereValues, (err, results, fields) => {
+    if (err) {
+      console.log("Failed to update attendee list: " + err);
+    }
+    res.send(results)
+  });
 })
 
 // Create an event given its organizerID, title, location,
