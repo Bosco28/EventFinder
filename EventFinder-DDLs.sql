@@ -1,6 +1,5 @@
 DROP TABLE User;
 DROP TABLE CreditCard;
-DROP TABLE Organizer;
 DROP TABLE Event;
 DROP TABLE PaidEvent;
 DROP TABLE Staff;
@@ -19,8 +18,7 @@ CREATE TABLE User (
     FirstName VARCHAR(50) NOT NULL,
     LastName VARCHAR(50) NOT NULL,
     DateOfBirth DATE NOT NULL,
-    Gender VARCHAR(50) NOT NULL,
-    FOREIGN KEY (DateOfBirth) REFERENCES DoB(DateOfBirth) ON DELETE NO ACTION ON UPDATE CASCADE
+    Gender VARCHAR(50) NOT NULL
 );
 
 CREATE TABLE CreditCard (
@@ -28,12 +26,6 @@ CREATE TABLE CreditCard (
     ExpiryDate DATE NOT NULL,
     HolderName VARCHAR(100) NOT NULL,
     CVC INT NOT NULL
-);
-
-CREATE TABLE Organizer (
-    OrganizerUserID INT PRIMARY KEY,
-    OrganizerContactInfo VARCHAR(200) NOT NULL,
-	FOREIGN KEY (OrganizerUserID) REFERENCES User(UserID) ON DELETE CASCADE
 );
 
 CREATE TABLE Event (
@@ -44,9 +36,8 @@ CREATE TABLE Event (
     Description VARCHAR(200),
     LocationAddress VARCHAR(200),
     OrganizerUserID INT,
-    FOREIGN KEY (LocationAddress) REFERENCES Location(Address) ON DELETE NO ACTION,
-    FOREIGN KEY (OrganizerUserID) REFERENCES User(UserID) ON DELETE SET NULL,
-    FOREIGN KEY (OrganizerUserID) REFERENCES Organizer(OrganizerUserID) ON DELETE NO ACTION
+	OrganizerContactInfo VARCHAR(200),
+    FOREIGN KEY (OrganizerUserID) REFERENCES User(UserID) ON DELETE SET NULL
 );
 
 CREATE TABLE PaidEvent (
@@ -131,21 +122,16 @@ CREATE TABLE Participate (
     FOREIGN KEY (EventID) REFERENCES Event(EventID) ON DELETE CASCADE
 );
 
-INSERT INTO DoB VALUES ('1991-05-23', 29);
-INSERT INTO DoB VALUES ('1991-06-02', 28);
-INSERT INTO DoB VALUES ('1972-12-10', 48);
-INSERT INTO DoB VALUES ('1982-10-06', 38);
-INSERT INTO DoB VALUES ('1933-04-25', 87);
 INSERT INTO User VALUES (51, 'JOHN', 'SMITH', '1991-05-23', 'Male');
 INSERT INTO User VALUES (52, 'PETER', 'PARKER', '1991-06-02','Male');
 INSERT INTO User VALUES (53, 'Tony', 'Stark', '1972-12-10','Male');
 INSERT INTO User VALUES (54, 'Black', 'Widow', '1982-10-06','Female');
 INSERT INTO User VALUES (55, 'Steve', 'Rogers', '1933-04-25','Male');
-INSERT INTO Event VALUES(0, 'Comedy Club', '2020-04-15', '2020-04-17','Full of laughs','Beatty Street, Vancouver', NULL);
-INSERT INTO Event VALUES(1, 'UFC Fight','2020-05-03','2020-05-03', 'McGreggor Vs Khalid', 'Gastown', 55 );
-INSERT INTO Event VALUES(2, 'Circus', '2020-04-23','2020-05-03','Cirque de Solil', 'Granville Street', 53 );
-INSERT INTO Event VALUES(3, 'Play', '2020-05-24','2020-06-07','Theatrical Play','Mainland Street', Null );
-INSERT INTO Event VALUES(4, 'Drinking Challenge', '2020-06-07','2020-06-09', 'Beer Drinking Competition','Gastown',NULL );
+INSERT INTO Event VALUES(0, 'Comedy Club', '2020-04-15', '2020-04-17','Full of laughs','Beatty Street, Vancouver', NULL, NULL);
+INSERT INTO Event VALUES(1, 'UFC Fight','2020-05-03','2020-05-03', 'McGreggor Vs Khalid', 'Gastown', 55, "55@eventfinder.com" );
+INSERT INTO Event VALUES(2, 'Circus', '2020-04-23','2020-05-03','Cirque de Solil', 'Granville Street', 53, "53@eventfinder.com" );
+INSERT INTO Event VALUES(3, 'Play', '2020-05-24','2020-06-07','Theatrical Play','Mainland Street', Null, Null );
+INSERT INTO Event VALUES(4, 'Drinking Challenge', '2020-06-07','2020-06-09', 'Beer Drinking Competition','Gastown',NULL, NULL );
 insert into EventType values ('sports', 18);
 insert into EventType values ('study', 0);
 insert into EventType values ('group event', 14);
