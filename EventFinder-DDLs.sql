@@ -20,6 +20,7 @@ CREATE TABLE User (
     LastName VARCHAR(50) NOT NULL,
     DateOfBirth DATE NOT NULL,
     Gender VARCHAR(50) NOT NULL,
+    FOREIGN KEY (DateOfBirth) REFERENCES DoB(DateOfBirth) ON DELETE NO ACTION ON UPDATE CASCADE
 );
 
 CREATE TABLE CreditCard (
@@ -41,7 +42,9 @@ CREATE TABLE Event (
     StartDate TIMESTAMP NOT NULL,
     EndDate TIMESTAMP NOT NULL,
     Description VARCHAR(200),
+    LocationAddress VARCHAR(200),
     OrganizerUserID INT,
+    FOREIGN KEY (LocationAddress) REFERENCES Location(Address) ON DELETE NO ACTION,
     FOREIGN KEY (OrganizerUserID) REFERENCES User(UserID) ON DELETE SET NULL,
     FOREIGN KEY (OrganizerUserID) REFERENCES Organizer(OrganizerUserID) ON DELETE NO ACTION
 );
@@ -128,18 +131,21 @@ CREATE TABLE Participate (
     FOREIGN KEY (EventID) REFERENCES Event(EventID) ON DELETE CASCADE
 );
 
+INSERT INTO DoB VALUES ('1991-05-23', 29);
+INSERT INTO DoB VALUES ('1991-06-02', 28);
+INSERT INTO DoB VALUES ('1972-12-10', 48);
+INSERT INTO DoB VALUES ('1982-10-06', 38);
+INSERT INTO DoB VALUES ('1933-04-25', 87);
 INSERT INTO User VALUES (51, 'JOHN', 'SMITH', '1991-05-23', 'Male');
 INSERT INTO User VALUES (52, 'PETER', 'PARKER', '1991-06-02','Male');
 INSERT INTO User VALUES (53, 'Tony', 'Stark', '1972-12-10','Male');
 INSERT INTO User VALUES (54, 'Black', 'Widow', '1982-10-06','Female');
 INSERT INTO User VALUES (55, 'Steve', 'Rogers', '1933-04-25','Male');
-INSERT INTO Organizer VALUES(53, "organizer3@organizer.com");
-INSERT INTO Organizer VALUES(55, "organizer5@organizer.com");
-INSERT INTO Event VALUES(0, 'Comedy Club', '2020-04-15', '2020-04-17','Full of laughs', NULL);
-INSERT INTO Event VALUES(1, 'UFC Fight','2020-05-03','2020-05-03', 'McGreggor Vs Khalid', 55 );
-INSERT INTO Event VALUES(2, 'Circus', '2020-04-23','2020-05-03','Cirque de Solil', 53 );
-INSERT INTO Event VALUES(3, 'Play', '2020-05-24','2020-06-07','Theatrical Play', Null );
-INSERT INTO Event VALUES(4, 'Drinking Challenge', '2020-06-07','2020-06-09', 'Beer Drinking Competition', NULL );
+INSERT INTO Event VALUES(0, 'Comedy Club', '2020-04-15', '2020-04-17','Full of laughs','Beatty Street, Vancouver', NULL);
+INSERT INTO Event VALUES(1, 'UFC Fight','2020-05-03','2020-05-03', 'McGreggor Vs Khalid', 'Gastown', 55 );
+INSERT INTO Event VALUES(2, 'Circus', '2020-04-23','2020-05-03','Cirque de Solil', 'Granville Street', 53 );
+INSERT INTO Event VALUES(3, 'Play', '2020-05-24','2020-06-07','Theatrical Play','Mainland Street', Null );
+INSERT INTO Event VALUES(4, 'Drinking Challenge', '2020-06-07','2020-06-09', 'Beer Drinking Competition','Gastown',NULL );
 insert into EventType values ('sports', 18);
 insert into EventType values ('study', 0);
 insert into EventType values ('group event', 14);
