@@ -1,3 +1,21 @@
+DROP TABLE DoB;
+DROP TABLE User;
+DROP TABLE CreditCard;
+DROP TABLE Organizer;
+DROP TABLE Location;
+DROP TABLE Event;
+DROP TABLE PaidEvent;
+DROP TABLE Staff;
+DROP TABLE Company;
+DROP TABLE Sponsor;
+DROP TABLE EventType;
+DROP TABLE WorkOn;
+DROP TABLE EventHasType;
+DROP TABLE InterestedIn;
+DROP TABLE Friend;
+DROP TABLE PayWith;
+DROP TABLE Participate;
+
 CREATE TABLE DoB (
     DateOfBirth DATE PRIMARY KEY,
     Age INT NOT NULL
@@ -25,6 +43,11 @@ CREATE TABLE Organizer (
 	FOREIGN KEY (OrganizerUserID) REFERENCES User(UserID) ON DELETE CASCADE
 );
 
+CREATE TABLE Location (
+    Address VARCHAR(200) PRIMARY KEY,
+    Name VARCHAR(200) NOT NULL
+);
+
 CREATE TABLE Event (
     EventID INT PRIMARY KEY AUTO_INCREMENT,
     Title VARCHAR(200) NOT NULL,
@@ -48,11 +71,6 @@ CREATE TABLE Staff (
     StaffID INT PRIMARY KEY AUTO_INCREMENT,
     Name VARCHAR(100) NOT NULL,
     PayRate INTEGER NOT NULL
-);
-
-CREATE TABLE Location (
-    Address VARCHAR(200) PRIMARY KEY,
-    Name VARCHAR(200) NOT NULL
 );
 
 CREATE TABLE Company (
@@ -142,11 +160,11 @@ INSERT INTO Location VALUES('Gastown');
 INSERT INTO Location VALUES('Granville Street');
 INSERT INTO Organizer VALUES(53, "organizer3@organizer.com");
 INSERT INTO Organizer VALUES(55, "organizer5@organizer.com");
-INSERT INTO Event VALUES(101, 'Comedy Club', '2020-04-15', '2020-04-17','Full of laughs','Beatty Street, Vancouver', NULL);
-INSERT INTO Event VALUES(102, 'UFC Fight','2020-05-03','2020-05-03', 'McGreggor Vs Khalid', 'Gastown', 55 );
-INSERT INTO Event VALUES(103, 'Circus', '2020-04-23','2020-05-03','Cirque de Solil', 'Granville Street', 53 );
-INSERT INTO Event VALUES(104, 'Play', '2020-05-24','2020-06-07','Theatrical Play','Mainland Street', Null );
-INSERT INTO Event VALUES(105, 'Drinking Challenge', '2020-06-07','2020-06-09', 'Beer Drinking Competition','Gastown',NULL );
+INSERT INTO Event VALUES(0, 'Comedy Club', '2020-04-15', '2020-04-17','Full of laughs','Beatty Street, Vancouver', NULL);
+INSERT INTO Event VALUES(1, 'UFC Fight','2020-05-03','2020-05-03', 'McGreggor Vs Khalid', 'Gastown', 55 );
+INSERT INTO Event VALUES(2, 'Circus', '2020-04-23','2020-05-03','Cirque de Solil', 'Granville Street', 53 );
+INSERT INTO Event VALUES(3, 'Play', '2020-05-24','2020-06-07','Theatrical Play','Mainland Street', Null );
+INSERT INTO Event VALUES(4, 'Drinking Challenge', '2020-06-07','2020-06-09', 'Beer Drinking Competition','Gastown',NULL );
 insert into EventType values ('sports', 18);
 insert into EventType values ('study', 0);
 insert into EventType values ('group event', 14);
@@ -157,11 +175,11 @@ insert into CreditCard values (9876543211234, 'September 22', 'Bruce Wayne','000
 insert into CreditCard values(4632850327091, 'May 24', 'Lex Luther', '233');
 insert into CreditCard values(12343528357318,'May 22', 'Martha Kent', '123');
 insert into CreditCard values(3258238571048, 'Oct 21', 'Louis Layne', '455');                   
-insert into PaidEvent values(101, 100);
-insert into PaidEvent values(102,49);
-insert into PaidEvent values(103,27);
-insert into PaidEvent values(104, 39);
-insert into PaidEvent values(105,0);                        
+insert into PaidEvent values(0, 100);
+insert into PaidEvent values(1,49);
+insert into PaidEvent values(2,27);
+insert into PaidEvent values(3, 39);
+insert into PaidEvent values(4,0);                        
 insert into  Company values(542154,'Coke');
 insert into  Company values(985462,'Dell');
 insert into  Company values(387568, 'RBC');
@@ -178,13 +196,13 @@ insert into PayWith values (52,9876543211234, 1);
 insert into PayWith values (53,4632850327091, 1);
 insert into PayWith values (54, 12343528357318, 1);
 insert into PayWith values (55,3258238571048, 1);
-insert into workon values (901,105);
-insert into workon values (902,104);
-insert into workon values (903,102);
-insert into workon values (904,101);
-insert into workon values (905,102);
-insert into sponsor values (101, 542154, 'Jimmy', 2500);
-insert into sponsor values (102, 985462,'Paul', 1200);
-insert into sponsor values (103, 387568,'Howard', 3500);
-insert into sponsor values (104, 2345235,'Roger',  6500);
-insert into sponsor values (105, 2143132,'Wallie',  10000);
+insert into workon values (901,4);
+insert into workon values (902,3);
+insert into workon values (903,1);
+insert into workon values (904,0);
+insert into workon values (905,1);
+insert into sponsor values (0, 542154, 'Jimmy', 2500);
+insert into sponsor values (1, 985462,'Paul', 1200);
+insert into sponsor values (2, 387568,'Howard', 3500);
+insert into sponsor values (3, 2345235,'Roger',  6500);
+insert into sponsor values (4, 2143132,'Wallie',  10000);
