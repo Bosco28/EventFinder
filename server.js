@@ -50,13 +50,12 @@ function buildWheres(params) {
         (SELECT e1.EventID FROM Event e1 \
           WHERE NOT EXISTS \
             (SELECT * FROM EventType et \
-              WHERE et.TypeName IN (?) AND \
+              WHERE et.TypeName IN (" + params.types.map((type,i,_) => "\""+type+"\"").toString() + ") AND \
                 NOT EXISTS \
                 (SELECT * FROM EventHasType eht \
 		              WHERE eht.EventID = e1.EventID AND \
                     eht.EventType = et.TypeName)))"
     conditions.push(query);
-    values.push(params.types.toString());
   }
 
   return {
@@ -89,7 +88,7 @@ app.post('/api/events', (req, res) => {
 
             
   console.log(queryString);
-  console.log(whereXvalues);
+  console.log(whereValues);
   getConnection().query(queryString, whereValues, (err, results, fields) => {
     if (err) {
       console.log("Failed to update attendee list: " + err);
