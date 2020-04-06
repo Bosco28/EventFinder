@@ -57,16 +57,14 @@ app.post('/api/events', (req, res) => {
 app.post('/api/event', (req, res) => {
   console.log("Trying to create a new event...");
   const organizerID = req.body.organizerID;
-  const organizerContactInfo = "organizer" + organizerID + "@" + "eventfinder.com";
+  const organizerContactInfo = organizerID + "@" + "eventfinder.com";
   const title = req.body.title;
   const location = req.body.location;
   const startDate = req.body.startDate;
   const endDate = req.body.endDate;
   const description = req.body.description;
-  const queryStringEvent = "INSERT INTO Event (Title, StartDate, EndDate, Description, LocationAddress, OrganizerUserID) VALUES (?, ?, ?, ?, ?, ?)";
-  const queryStringOrganizer = "INSERT INTO Organizer (OrganizerUserID, OrganizerContactInfo) VALUES (?, ?)";
+  const queryStringEvent = "INSERT INTO Event (Title, StartDate, EndDate, Description, LocationAddress, OrganizerUserID, OrganizerContactInfo) VALUES (?, ?, ?, ?, ?, ?, ?)";
   const queryStringEventType = "INSERT INTO EventType (TypeName, AgeLimit) VALUES (?, ?)";
-  const queryStringLocation = "INSERT INTO Location (Address) VALUES (?)";
 
   const typeNames = ["Family Event", "Overnight Party", "Job Fair", "Auto Show", "National Day Fireworks", "Outdoor Movie", "Debate"];
   const randomNumber = Math.floor(Math.random() * typeNames.length);
@@ -74,41 +72,23 @@ app.post('/api/event', (req, res) => {
   const ageLimits = [100, 18, 21, 19, 65];
   const randomAge = Math.floor(Math.random() * ageLimits.length);
 
-  getConnection().query(queryStringLocation, [location], (err, result, fields) => {
+  getConnection().query(queryStringEventType, [typeNames[randomNumber], ageLimits[randomAge]], (err, results, fields) => {
     if (err) {
-      console.log("Failed to create entry in Location: " + err);
+      console.log("Failed to create new entry in EventType");
       res.sendStatus(500);
       return;
     }
-    console.log("Inserted a new Location entry");
+    console.log("New entry created in EventType");
 
-    getConnection().query(queryStringEventType, [typeNames[randomNumber], ageLimits[randomAge]], (err, results, fields) => {
+    getConnection().query(queryStringEvent, [title, startDate, endDate, description, location, organizerID, organizerContactInfo], (err, val, fields) => {
       if (err) {
-        console.log("Failed to create new entry in EventType");
+        console.log("Failed to create new event: " + err);
         res.sendStatus(500);
         return;
       }
-      console.log("New entry created in EventType");
-
-      getConnection().query(queryStringOrganizer, [organizerID, organizerContactInfo], (err, results, fields) => {
-        if (err) {
-          console.log("Failed to create new entry in Organizer: " + err);
-          res.sendStatus(500);
-          return;
-        }
-        console.log("New entry created in Organizer");
-
-        getConnection().query(queryStringEvent, [title, startDate, endDate, description, location, organizerID], (err, val, fields) => {
-          if (err) {
-            console.log("Failed to create new event: " + err);
-            res.sendStatus(500);
-            return;
-          }
-          console.log("Inserted a new event");
-          res.sendStatus(200);
-          return;
-        });
-      });
+      console.log("Inserted a new event");
+      res.sendStatus(200);
+      return;
     });
   });
 })
@@ -169,40 +149,27 @@ app.post('/api/user', (req, res) => {
   const holderName = req.body.holderName;
   const cvc = req.body.CVC;
   const queryStringUser = "INSERT INTO User (FirstName, LastName, DateOfBirth, Gender) VALUES (?, ?, ?, ?)";
-  const queryStringDateOfBirth = "INSERT INTO DoB (DateOfBirth, Age) VALUES (?, ?)";
   const queryStringCard = "INSERT INTO CreditCard (CardNumber, ExpiryDate, HolderName, CVC) VALUES (?, ?, ?, ?)";
 
-  const today = new Date();
-  const birthDate = new Date(dateOfBirth);
-  const age = today.getFullYear() - birthDate.getFullYear();
 
-  getConnection().query(queryStringDateOfBirth, [dateOfBirth, age], (err, results, fields) => {
+  getConnection().query(queryStringUser, [firstName, lastName, dateOfBirth, gender], (err, results, fields) => {
     if (err) {
-      console.log("Failed to insert new birthday entry: " + err);
+      console.log("Failed to insert new user: " + err);
       res.sendStatus(500);
       return;
     }
-    console.log("Inserted a new birthday entry");
+    console.log("Inserted a new user with id: " + results.insertId);
 
-    getConnection().query(queryStringUser, [firstName, lastName, dateOfBirth, gender], (err, results, fields) => {
+    getConnection().query(queryStringCard, [cardNumber, expiryDate, holderName, cvc], (err, results, fields) => {
       if (err) {
-        console.log("Failed to insert new user: " + err);
+        console.log("Failed to insert new credit card record: " + err);
         res.sendStatus(500);
         return;
       }
-      console.log("Inserted a new user with id: " + results.insertId);
+      console.log("Inserted a new credit card entry");
 
-      getConnection().query(queryStringCard, [cardNumber, expiryDate, holderName, cvc], (err, results, fields) => {
-        if (err) {
-          console.log("Failed to insert new credit card record: " + err);
-          res.sendStatus(500);
-          return;
-        }
-        console.log("Inserted a new credit card entry");
-
-        res.sendStatus(200);
-        return;
-      });
+      res.sendStatus(200);
+      return;
     });
   });
 });
