@@ -37,7 +37,7 @@ const MenuProps = {
 };
 
 const types = [
-  'sports','study','group event','dining','charity','motorsports'
+  'sports','study','group event','dining','charity','business'
 ];
 
 function getStyles(type, selectedTypes, theme) {

@@ -17,10 +17,46 @@ function getConnection() {
   });
 }
 
+function buildConditions(params) {
+  var conditions = [];
+  var values = [];
+
+  if (typeof params.location !== 'undefined') {
+    conditions.push("e.LocationAddress LIKE ?");
+    values.push("%" + params.location + "%");
+  }
+
+  if (typeof params.title !== 'undefined') {
+    conditions.push("e.Title LIKE= ?");
+    values.push("%" + params.title + "%");
+  }
+
+  if (typeof params.startDate !== 'undefined' &&
+      typeof params.endDate !== 'undefined') {
+    conditions.push("e.StartDate BETWEEN ? AND ? AND e.EndDate BETWEEN ? AND ?");
+    values.push(params.startDate);
+    values.push(params.endDate);
+    values.push(params.startDate);
+    values.push(params.endDate);
+  }
+
+  return {
+    where: conditions.length ?
+             'WHERE ' + conditions.join(' AND ') : '',
+    values: values
+  };
+}
+
 // Find events with the given filters on location, title,
 // organizerName, types, startDate, endDate
 app.post('/api/events', (req, res) => {
   console.log(req.body);
+
+  whereXvalues = buildConditions(req.body);
+  console.log(whereXvalues);
+  where = whereXvalues.where;
+  values = whereXvalues.values;
+
   res.send(
     [
       {
