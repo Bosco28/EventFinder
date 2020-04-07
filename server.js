@@ -67,7 +67,6 @@ function buildWheres(params) {
 
 // Find events with the given filters on location, title,
 // organizerName, types, startDate, endDate
-// TODO?
 app.post('/api/events', (req, res) => {
   console.log(req.body);
   whereXvalues = buildWheres(req.body);
@@ -76,24 +75,37 @@ app.post('/api/events', (req, res) => {
 
   queryString = 
     "SELECT e.*, \
-            CONCAT(u.FirstName, \" \", u.LastName) as OrganizerName, \
+            CONCAT(u.FirstName, \" \", u.LastName) AS OrganizerName, \
             (SELECT GROUP_CONCAT(eht.EventType) \
               FROM EventHasType eht \
-              WHERE eht.EventID = e.EventID) as Types, \
-            (SELECT DISTINCT GROUP_CONCAT(CONCAT(u1.FirstName, \" \", u1.LastName)) \
-              FROM Participate p JOIN User u1 \
-              WHERE P.EventID = P.EventID) as Attendees \
+              WHERE eht.EventID = e.EventID) AS Types, \
+            (SELECT GROUP_CONCAT(DISTINCT CONCAT(u1.FirstName, \" \", u1.LastName)) \
+              FROM Participate p JOIN User u1 ON p.UserID = u1.UserID \
+              WHERE p.EventID = e.EventID) AS Attendees \
             FROM Event e \
             JOIN User u ON e.OrganizerUserID=u.UserID " + whereClauses;
 
-            
-  console.log(queryString);
-  console.log(whereValues);
   getConnection().query(queryString, whereValues, (err, results, fields) => {
     if (err) {
       console.log("Failed to update attendee list: " + err);
     }
     res.send(results)
+  });
+})
+
+// Find gender ratio on an event
+app.get('/api/event/:eventID', (req, res) => {
+  queryString = 
+    "SELECT COUNT(*) AS Count, u.gender AS Gender \
+      FROM Participate p JOIN User u ON p.UserID = u.UserID \
+      WHERE p.EventID = ? \
+      GROUP BY u.gender";
+
+  getConnection().query(queryString, [req.params.eventID], (err, results, fields) => {
+    if (err) {
+      console.log("Failed to update attendee list: " + err);
+    }
+    res.send(results);
   });
 })
 
@@ -139,7 +151,6 @@ app.post('/api/event', (req, res) => {
 })
 
 // Delete the event with given eventID
-// TODO
 app.delete('/api/event/:eventID', (req, res) => {
   console.log("Deleting event with ID = " + req.params.eventID);
   const eventId = req.params.eventID;
@@ -160,7 +171,6 @@ app.delete('/api/event/:eventID', (req, res) => {
 
 // User with userID joins event with eventID. Create such
 // entry in Participate table
-// TODO
 app.put('/api/event/:eventID/user/:userID', (req, res) => {
   console.log("Updating attendee list for event: " + req.params.eventID);
   const userId = req.params.userID;
@@ -244,5 +254,20 @@ app.get('/api/user/:userID', (req, res) => {
   });
 
 });
+
+app.put('/api/event/:eventID', (req, res) => {
+  eventTitle = req.body.title;
+  eventID = req.params.eventID;
+  queryString = "UPDATE Event SET Title = ? where eventID = ?"
+  getConnection().query(queryString, [eventTitle, eventID], (err, result, fields) => {
+    if (err) {
+      console.log("Unable to update title: " + err);
+      res.sendStatus(500);
+      return;
+    }
+    res.sendStatus(200);
+    return;
+  });
+})
 
 app.listen(port, () => console.log(`Listening on port ${port}`));

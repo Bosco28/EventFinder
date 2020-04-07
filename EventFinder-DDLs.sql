@@ -122,8 +122,8 @@ CREATE TABLE Participate (
     FOREIGN KEY (EventID) REFERENCES Event(EventID) ON DELETE CASCADE
 );
 
-INSERT INTO User VALUES (51, 'JOHN', 'SMITH', '1991-05-23', 'Male');
-INSERT INTO User VALUES (52, 'PETER', 'PARKER', '1991-06-02','Male');
+INSERT INTO User VALUES (51, 'John', 'Smith', '1991-05-23', 'Male');
+INSERT INTO User VALUES (52, 'Peter', 'Parker', '1991-06-02','Male');
 INSERT INTO User VALUES (53, 'Tony', 'Stark', '1972-12-10','Male');
 INSERT INTO User VALUES (54, 'Black', 'Widow', '1982-10-06','Female');
 INSERT INTO User VALUES (55, 'Steve', 'Rogers', '1933-04-25','Male');
@@ -155,7 +155,27 @@ insert into  Staff values(902, 'Loretta', 12);
 insert into  Staff values(903, 'Tony', 20);
 insert into  Staff values(904, 'Arvin', 33);
 insert into  Staff values(905, 'David', 35); 
+insert into Participate values (51, 3, 'Registered');
+insert into Participate values (51, 4, 'Registered');
+insert into Participate values (51, 5, 'Registered');
+insert into Participate values (51, 1, 'Registered');
+insert into Participate values (52, 1, 'Registered');
 insert into Participate values (52, 2, 'Registered');
+insert into Participate values (52, 3, 'Registered');
+insert into Participate values (52, 4, 'Registered');
+insert into Participate values (52, 5, 'Registered');
+insert into Participate values (52, 0, 'Registered');
+insert into Participate values (53, 1, 'Registered');
+insert into Participate values (53, 2, 'Registered');
+insert into Participate values (53, 5, 'Registered');
+insert into Participate values (53, 0, 'Registered');
+insert into Participate values (54, 1, 'Registered');
+insert into Participate values (54, 2, 'Registered');
+insert into Participate values (54, 5, 'Registered');
+insert into Participate values (55, 1, 'Registered');
+insert into Participate values (55, 3, 'Registered');
+insert into Participate values (55, 5, 'Registered');
+insert into Participate values (55, 0, 'Registered');
 insert into PayWith values (51,1234567891233, 1);
 insert into PayWith values (52,9876543211234, 1);
 insert into PayWith values (53,4632850327091, 1);

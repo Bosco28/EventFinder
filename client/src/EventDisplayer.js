@@ -11,6 +11,8 @@ import Button from '@material-ui/core/Button';
 import ButtonGroup from '@material-ui/core/ButtonGroup';
 import MultiSelectTypeGroup from './MultiSelectTypeGroup';
 import AddCircleIcon from '@material-ui/icons/AddCircle';
+import EventNameChanger from './EventNameChanger';
+import PersonIcon from '@material-ui/icons/Person';
 
 import './EventDisplayer.css';
 
@@ -68,6 +70,13 @@ class EventDisplayer extends Component {
                     loading: false
                 }))
             .catch(err => this.handleError(err));
+    }
+    getAttendeeInfo = async eventID => {
+        fetch(`/api/event/${eventID}`)
+        .then(res => this.handleResponse(res).json())
+        .then(res => res.map(item => `${item.Gender}: ${item.Count}`))
+        .then(info => alert(info.join(", ")))
+        .catch(err => this.handleError(err));
     }
 
     deleteEvent = async eventID => {
@@ -196,6 +205,21 @@ class EventDisplayer extends Component {
                                     title={event.Title}
                                     action={
                                         <ButtonGroup color="primary" aria-label="outlined primary button group">
+                                        <EventNameChanger 
+                                            eventID={event.EventID} 
+                                            disabled={event.OrganizerUserID !== this.props.userID}
+                                            onChangeEventTitle=
+                                                {_ => this.setState(
+                                                    { 
+                                                        events: [], 
+                                                        location: null,
+                                                        title: null,
+                                                        organizerName: null,
+                                                        types: [],
+                                                        startDate: null,
+                                                        endDate: null,
+                                                        loading: false
+                                                    })} />
                                             <Button 
                                                 onClick={_ => this.joinEvent(event.EventID)} 
                                             >
@@ -206,6 +230,12 @@ class EventDisplayer extends Component {
                                                 disabled={event.OrganizerUserID !== this.props.userID}
                                             >
                                                 <DeleteForeverIcon />
+                                            </Button>
+                                            <Button 
+                                                onClick={_ => this.getAttendeeInfo(event.EventID)}
+                                                disabled={event.OrganizerUserID !== this.props.userID}
+                                            >
+                                                <PersonIcon />
                                             </Button>
                                         </ButtonGroup>
                                     }
